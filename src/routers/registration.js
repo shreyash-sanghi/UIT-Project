@@ -6,20 +6,21 @@ const Register = require('../Model/RegModel');
 const  StuRegister = require('../Model/StuRegModel');
 
 
-router.get("/registration/:id",verify, async(req,res)=>{
+router.get("/registration/:id", async(req,res)=>{
     try {
      res.sendStatus(201);
     } catch (error) {
        res.status(404).send(error);
     }
   })
-  router.post("/registration/:id",verify, async(req,res)=>{
+  router.post("/registration/:id", async(req,res)=>{
     try {
-      const {Password,Cpassword,GroupName,Fname, CurrentLeader, Email,MobileNumber} = req.body;
-      if(Password === Cpassword){
-       await Register.create({
+      const {Password,Cpassword,GroupName,Fname, CurrentLeader, Email,MobileNumber,secretkey} = req.body;
+      if(Password === Cpassword && secretkey===process.env.MainSecretKey){
+      const reg = await Register.create({
           Password,Cpassword,GroupName,Fname, CurrentLeader, Email,MobileNumber
          })
+        const token = await reg.generateAuthToken();
          res.sendStatus(201);
       }
       else{

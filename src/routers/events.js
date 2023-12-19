@@ -7,6 +7,9 @@ const  AddEvent = require('../Model/event_data');
 const PastEvent = require('../Model/PastEvent.js');
 const bcrypt = require('bcryptjs');
 const Request = require('../Model/ReqModel');
+const multer = require('multer');
+const path = require("path");
+
 
 //Event Verification Request
 
@@ -25,6 +28,7 @@ router.get("/VerifyEvent/:id",verify,async(req,res)=>{
       RegLink:find.RegLink,
       EventBanner:find.EventBanner,
       Email: find.ReqEmail,
+      Image: find.image,
      })
     } catch (error) {
       res.status(404).send(error);
@@ -33,9 +37,9 @@ router.get("/VerifyEvent/:id",verify,async(req,res)=>{
   
   router.post("/VerifyEvent/:id",verify, async(req,res)=>{
     try {
-      const {EventName,Discreption,Place,EDate,Time,Name,RegLink,EventBanner, ReqEmail} = req.body;
+      const {EventName,Discreption,Place,EDate,Time,Name,RegLink,Image, ReqEmail} = req.body;
         const response = await AddEvent.create({
-          EventName,Discreption,Place,EDate,Time,Name,RegLink,EventBanner, ReqEmail
+          EventName,Discreption,Place,EDate,Time,Name,RegLink, ReqEmail,image:Image
         });
         res.sendStatus(202);
     } catch (error) {
@@ -52,9 +56,11 @@ router.get("/VerifyEvent/:id",verify,async(req,res)=>{
       res.sendStatus(404);
     }
   })
+
   router.get("/PastEvent/:id",async(req,res)=>{
     try{
     const data = await PastEvent.find();
+    console.log(data);
     res.json({data:data});
     res.status(201);
     }catch(error){
@@ -62,30 +68,48 @@ router.get("/VerifyEvent/:id",verify,async(req,res)=>{
     }
   })
 
+
+const images = path.join(__dirname, "../../public/images");
+
+ const storage = multer.diskStorage({
+   destination:function(req,file,cb){
+     return cb(null,images)
+   }
+   ,
+   filename:function(req,file,cb){
+     return cb(null,`${Date.now()}_${file.originalname}`)
+   }
+ })
+ 
+ const uplode =multer({storage})
+
   //Event Add
- router.post("/uplodeData",addData,async (req,res)=>{
+ router.post("/uplodeData",addData,uplode.single('file'),async (req,res)=>{
     try{
-    const {Password,ReqEmail,Discreption,EventName,Place,EventBanner,EDate, Time, Name,RegLink,MobileNumber} = req.body;
-     let em = req.user;
+    const {Password,ReqEmail,Discreption,EventName,Place,EDate, Time, Name,RegLink,MobileNumber} = req.body;
+    let em = req.user;
      let pa = req.password;
      const isMatch = await bcrypt.compare(Password, pa);
      if(em===ReqEmail && isMatch===true){
       if(ReqEmail === process.env.HostEmail1){
         await AddEvent.create({
-        EventName,Name,Discreption,Place,EDate, Time,ReqEmail,Name,RegLink,EventBanner
+        EventName,Name,Discreption,Place,EDate, Time,ReqEmail,Name,RegLink,
+        image:req.file.filename,
         })
       }
       else{
       const res = await Request.create({
-        Password,ReqEmail,EventName,Discreption, Place, EDate, Time,Name,MobileNumber,RegLink, EventBanner})
+        Password,ReqEmail,EventName,Discreption, Place, EDate, Time,Name,MobileNumber,RegLink,image:req.file.filename,})
       }
       res.json({HostEmail1:process.env.HostEmail1}).status(201);
      }
      else{
+      console.log(error)
       res.sendStatus(404);
      }
   }
   catch(error){
+    console.log(error)
     res.sendStatus(404);
   }
   })
@@ -172,9 +196,9 @@ router.delete("/PersonalPage/:id",async(req,res)=>{
     try {
       const _id = req.params.id;
        const deletedata = await AddEvent.findById(_id);
-       const {EventName,Discreption,Place,EDate, Time, Name,RegLink} = deletedata;
+       const {EventName,Discreption,Place,EDate, Time, Name,RegLink,image} = deletedata;
        await PastEvent.create({
-        EventName,Discreption,Place,EDate, Time, Name,RegLink
+        EventName,Discreption,Place,EDate, Time, Name,RegLink,image
        })
        await AddEvent.findByIdAndDelete(_id);
          res.sendStatus(202);

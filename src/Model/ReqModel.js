@@ -30,11 +30,10 @@ const Request = new mongoose.Schema({
     type: String,
     required:true,
   },
-
+   image:{type:String},
   Name: { type: String, required:true },
   MobileNumber: { type: String, required: true,minlength:[10] },
   RegLink: { type: String },
-  EventBanner: { type: String },
   EDate: { type: String, required: true },
 
 })

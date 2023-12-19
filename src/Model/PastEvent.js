@@ -29,9 +29,7 @@ const PastEvent = new mongoose.Schema({
     ,RegLink:{
         type:String
     },
-    EventBanner:{
-        type:String
-    },
+    image:{type:String},
 })
 
 const AddEvent = mongoose.model("PastData", PastEvent);

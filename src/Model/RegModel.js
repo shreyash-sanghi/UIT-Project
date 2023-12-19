@@ -59,7 +59,7 @@ const Register = new mongoose.Schema({
    //gernate tokens
    Register.methods.generateAuthToken = async function(){
     try {
-        const Token = jwt.sign({_id:this._id},"jjfvcvfhhffhdhfkjhfhfdfgfgfgsd");
+        const Token = jwt.sign({_id:this._id},process.env.Sectet_Key1);
         this.tokens = this.tokens.concat({token:Token})
         return Token;
     } catch (error) {
@@ -68,7 +68,7 @@ const Register = new mongoose.Schema({
 }
 Register.methods.LoginToken = async function(){
     try {
-        const Token = jwt.sign({_id:this._id},"jjfvcvfhhffhdhfkjhfhfdfgfgfgsd");
+        const Token = jwt.sign({_id:this._id},process.env.Sectet_Key1);
         this.tokens = this.tokens.concat({token:Token})
         await this.save();
         return Token;

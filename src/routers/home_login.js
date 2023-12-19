@@ -35,7 +35,7 @@ router.post("/login",async(req,res)=>{
     res.sendStatus(404);
   } 
 } catch (error) {
-  res.sendStatus(404);
+  res.sendStatus(404)
 }
 })
 

@@ -11,6 +11,7 @@ const pro = async (req,res,next)=>{
         const user = await Register.findOne({_id:varifyUser._id})
         req.user = user.Email;
         req.password = user.Password;
+        req.Name = user.Fname;
         next();
     } catch (error) {
         res.status(401).send("error"+error);

@@ -27,10 +27,10 @@ const Event = new mongoose.Schema({
         required:true,
         
     }
-    ,RegLink:{
+    ,image:{
         type:String
-    },
-    EventBanner:{
+    }
+    ,RegLink:{
         type:String
     },
      ReqEmail: {

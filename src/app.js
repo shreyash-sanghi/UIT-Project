@@ -11,8 +11,8 @@ const home_login = require('./routers/home_login.js');
 const complaint_page = require('./routers/complaint.js');
 require("./DB/RegisterData")
 const port = 4000 || process.env.PORT;
-
-
+const multer = require('multer');
+const path = require("path");
 
 //React Cors
 app.use(cors(
@@ -32,6 +32,7 @@ app.use(function(req, res, next) {
 });
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static('public'))
 app.use(cookieParser());
 app.use(request_router);
 app.use(total_registration);
@@ -39,6 +40,26 @@ app.use(Secret_Page);
 app.use(events_page);
 app.use(home_login);
 app.use(complaint_page);
+
+const images = path.join(__dirname, "../public/images");
+//  console.log(images);
+const storage = multer.diskStorage({
+  destination:function(req,file,cb){
+    return cb(null,images)
+  }
+  ,
+  filename:function(req,file,cb){
+    return cb(null,`${Date.now()}_${file.originalname}`)
+  }
+})
+
+const uplode =multer({storage})
+
+app.post("/uplode",uplode.single('file'),(req,res)=>{
+  console.log(req)
+  console.log(req.file)
+})
+
 
 //Port Listening Logic
 app.listen(port,()=>{

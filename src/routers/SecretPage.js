@@ -9,7 +9,7 @@ router.get("/PersonalPage/:id",pro,async(req,res)=>{
     try {
     let d = req.user;
     const data = await AddEvent.find({ ReqEmail: d});
-     res.json({data});
+     res.json({data:data});
     res.status(201);
   }
     catch (error) {
